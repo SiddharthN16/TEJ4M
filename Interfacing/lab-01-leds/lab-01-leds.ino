@@ -10,8 +10,8 @@ Updated: 2021.10.27
 -----------------------------------------------------------------
 */
 
-int ledPins[] = {1, 5, 2, 6, 3, 7, 4, 8};                   // array to hold pin numbers
-int delayTime[] = {500, 400, 300, 200, 100, 200, 300, 400}; // array of the delay times required
+int ledPins[] = {1, 5, 2, 6, 3, 7, 4, 8};                    // array to hold pin numbers
+int delayTimes[] = {500, 400, 300, 200, 100, 200, 300, 400}; // array of the delay times required
 
 void setup()
 {
@@ -24,21 +24,21 @@ void setup()
 
 void loop()
 {
-    // loop through all the delay times in delayTime array
+    // loop through all the delay times in delayTimess array
     for (int k = 0; k < 8; k += 1)
     {
-        // turn LEDs on, one at a time with delay of delayTime[k]
+        // turn LEDs on, one at a time with delay of delayTimes[k]
         for (int i = 0; i <= 7; i++)
         {
             digitalWrite(ledPins[i], HIGH);
-            delay(delayTime[k]);
+            delay(delayTimes[k]);
         }
 
-        // turn LEDs off, one at a time with delay of delayTime[k]
+        // turn LEDs off, one at a time with delay of delayTimes[k]
         for (int j = 8; j >= 0; j--)
         {
             digitalWrite(ledPins[j], LOW);
-            delay(delayTime[k]);
+            delay(delayTimes[k]);
         }
     }
 }
