@@ -1,6 +1,14 @@
-/* US Sensor - Written by Mr.K 2021.10.16
-   This code is written to sense distance and sound a buzzer
-   "tone" commands */
+/*
+-----------------------------------------------------------------
+Name: US Sensor - Written by Mr.K 2021.10.16
+Purpose: This code is written to sense distance and sound a buzzer
+"tone" commands
+
+Author: Siddharth Nema
+Created: 2021.10.28
+Updated: 2021.10.29
+-----------------------------------------------------------------
+*/
 
 // declare variables for pins
 int GREEN_LED_PIN = 4;
@@ -9,8 +17,10 @@ int BUZZER_PIN = 6;
 int TRIGGER_PIN = 3;
 int ECHO_PIN = 2;
 
+// declare variables used for calculations
 float duration;
 float distance;
+float frequency;
 
 void setup()
 {
@@ -35,19 +45,20 @@ void loop()
     distance = duration * 0.034 / 2;
     /************** End US Measurement Section ***********/
 
-    // if distance is less than 50cm
-    if (distance <= 110 && distance >= 90)
+    frequency = 1053 - distance * 9.57; // determine the frequency proportional to distance
+
+    // frequency changes depending on distance
+    if (distance > 0 && distance <= 110)
     {
-        digitalWrite(RED_LED_PIN, HIGH);
-        digitalWrite(GREEN_LED_PIN, LOW);
-        tone(BUZZER_PIN, 440);
+        tone(BUZZER_PIN, frequency);
     }
 
-    if (distance < 90 && distance > 70)
+    // when distance is not between 0 cm and 110 cm
+    else
     {
-        digitalWrite(RED_LED_PIN, HIGH);
+        digitalWrite(RED_LED_PIN, LOW);
         digitalWrite(GREEN_LED_PIN, LOW);
-        tone(BUZZER_PIN, 340);
+        noTone(BUZZER_PIN);
     }
 
     delay(10); // small delay to save system resources
