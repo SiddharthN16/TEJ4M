@@ -1,7 +1,7 @@
 {
-  "board": "arduino:avr:uno",
-  "programmer": "arduino:avrispmkii",
-  "port": "COM3",
-  "sketch": "Interfacing\\lab-01-leds\\lab-01-leds.ino",
-  "output": "Interfacing/build"
+    "board": "arduino:avr:uno",
+    "programmer": "arduino:avrispmkii",
+    "port": "COM13",
+    "sketch": "Interfacing\\lab-01-leds\\lab-01-leds.ino",
+    "output": "Interfacing/build"
 }
