@@ -15,7 +15,7 @@ int delayTimes[] = {500, 400, 300, 200, 100, 200, 300, 400}; // array of the del
 
 void setup()
 {
-    // set all LED pins as outputs.
+    // set all LED pins as outputs
     for (int i = 0; i <= 7; i++)
     {
         pinMode(ledPins[i], OUTPUT);
