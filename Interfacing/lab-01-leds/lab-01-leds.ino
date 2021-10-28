@@ -25,7 +25,7 @@ void setup()
 void loop()
 {
     // loop through all the delay times in delayTimess array
-    for (int k = 0; k < 8; k += 1)
+    for (int k = 0; k <= 7; k++)
     {
         // turn LEDs on, one at a time with delay of delayTimes[k]
         for (int i = 0; i <= 7; i++)
