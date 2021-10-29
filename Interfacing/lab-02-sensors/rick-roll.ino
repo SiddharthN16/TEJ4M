@@ -10,6 +10,19 @@
   -----------------------------------------------------------------
 */
 
+/*
+NOTES:
+A4: 415
+G4: 370
+F: 349
+E: 329
+D: 293
+C: 261
+B: 246
+A3: 220
+F3: 174
+*/
+
 // declare variables for pins
 int GREEN_LED_PIN = 4;
 int RED_LED_PIN = 5;
@@ -19,6 +32,77 @@ int ECHO_PIN = 2;
 
 float duration;
 float distance;
+
+int musicNotes[] = {
+    293,
+    329,
+    220,
+    329,
+    370,
+    440,
+    392,
+    349,
+    329,
+    293,
+    329,
+    220,
+
+    246,
+    261,
+    293,
+    246,
+
+    349,
+    349,
+
+    329,
+
+    220,
+    246,
+    261,
+    220,
+
+    220,
+    246,
+    261,
+    261,
+    246,
+
+    246,
+    261,
+    293,
+    246,
+
+    293,
+
+    329,
+    261,
+
+    246,
+
+    220,
+
+    174,
+
+    329,
+
+    293,
+
+};
+int musicDelays[] = {
+    750,
+    750,
+    500,
+    750,
+    750,
+    125,
+    125,
+    125,
+    125,
+    750,
+    750,
+    1500,
+    125, 125, 125, 125, 375, 375, 750, 125, 125, 125, 125, 375, 375, 375, 125, 250, 125, 125, 125, 125, 500, 250, 250, 250, 500, 250, 500, 1000};
 
 void setup()
 {
@@ -73,30 +157,12 @@ void loop()
         digitalWrite(RED_LED_PIN, HIGH);
         digitalWrite(GREEN_LED_PIN, LOW);
 
-        tone(BUZZER_PIN, 293);
-        delay(750);
-        tone(BUZZER_PIN, 329);
-        delay(750);
-        tone(BUZZER_PIN, 220);
-        delay(500);
-        tone(BUZZER_PIN, 329);
-        delay(750);
-        tone(BUZZER_PIN, 370);
-        delay(750);
-        tone(BUZZER_PIN, 440);
-        delay(125);
-        tone(BUZZER_PIN, 392);
-        delay(125);
-        tone(BUZZER_PIN, 349);
-        delay(125);
-        tone(BUZZER_PIN, 329);
-        delay(125);
-        tone(BUZZER_PIN, 293);
-        delay(750);
-        tone(BUZZER_PIN, 329);
-        delay(750);
-        tone(BUZZER_PIN, 220);
-        delay(1500);
+        // loops through the notes and delays of the song
+        for (int i = 0; i < 12; i++)
+        {
+            tone(BUZZER_PIN, musicNotes[i]);
+            delay(musicDelays[i]);
+        }
     }
 
     // any other distance value
