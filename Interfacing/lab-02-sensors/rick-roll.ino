@@ -72,7 +72,31 @@ void loop()
     {
         digitalWrite(RED_LED_PIN, HIGH);
         digitalWrite(GREEN_LED_PIN, LOW);
-        tone(BUZZER_PIN, 1040, 100);
+
+        tone(BUZZER_PIN, 293);
+        delay(750);
+        tone(BUZZER_PIN, 329);
+        delay(750);
+        tone(BUZZER_PIN, 220);
+        delay(500);
+        tone(BUZZER_PIN, 329);
+        delay(750);
+        tone(BUZZER_PIN, 370);
+        delay(750);
+        tone(BUZZER_PIN, 440);
+        delay(125);
+        tone(BUZZER_PIN, 392);
+        delay(125);
+        tone(BUZZER_PIN, 349);
+        delay(125);
+        tone(BUZZER_PIN, 329);
+        delay(125);
+        tone(BUZZER_PIN, 293);
+        delay(750);
+        tone(BUZZER_PIN, 329);
+        delay(750);
+        tone(BUZZER_PIN, 220);
+        delay(1500);
     }
 
     // any other distance value
