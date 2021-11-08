@@ -1,5 +1,6 @@
 {
     "board": "arduino:avr:uno",
     "programmer": "arduino:avrispmkii",
-    "sketch": "lab-03-lcds.ino"
+    "sketch": "lab-03-lcds.ino",
+    "port": "COM11"
 }
