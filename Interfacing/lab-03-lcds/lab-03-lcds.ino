@@ -1,10 +1,16 @@
-/* LCD - Written by Mr.K 2021.10.16
-   This code is written to display values to an LCD display
-   libraries, LCD library commands */
+/* Pushbuttons - Written by Mr.K 2021.10.16
+   This code is written to display the state of a pushbutton
+   digitalRead */
 
 #include <LiquidCrystal.h>
 
 LiquidCrystal lcd(7, 6, 5, 4, 3, 2); // initialize the LCD with pin numbers
+
+int button1Pin = 8; //set pin where button 1 is wired
+int button2Pin = 9; //set pin where button 2 is wired
+
+int button1State; //create variable for the state of button 1
+int button2State; //create variable for the state of button 2
 
 void setup()
 {
@@ -13,35 +19,36 @@ void setup()
 
 void loop()
 {
-  /* print a message to the LCD starting at column 0, line 0
-  and wait 1 second*/
-  lcd.setCursor(0, 0);
-  lcd.print("Self destruct in:");
-  delay(1000);
+  button1State = digitalRead(button1Pin); //read state of pushbutton
+  button2State = digitalRead(button2Pin); //read state of pushbutton
 
-  /* print numbers 5, 4, 3, 2, 1 every second
-  starting at column 0 line 1*/
-  for (int n = 5; n > 0; n--)
-  {
-    lcd.setCursor(0, 1);
-    lcd.print(n);
-    delay(1000);
-  }
-
-  //clear LCD and flash BOOM on and off
-  for (int n = 10; n > 0; n--)
+  if (button1State == LOW && button2State == LOW) //button is pressed
   {
     lcd.clear();
-    delay(200);
-    lcd.print("BOOM!");
-    delay(200);
+    lcd.setCursor(0, 0);
+    lcd.print("Both Pressed");
   }
 
-  //print just kidding to LCD
-  lcd.clear();
-  lcd.print("just kidding");
-
-  while (true) // loop forever
+  else if (button1State == LOW)
   {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("PB1 Pressed");
   }
+
+  else if (button2State == LOW)
+  {
+    lcd.clear();
+    lcd.setCursor(0, 1);
+    lcd.print("PB2 Pressed");
+  }
+
+  else if (button1State == HIGH && button2State == HIGH)
+  {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("No Buttons Pressed");
+  }
+
+  delay(100); //delay to allow screen to update
 }
