@@ -3,48 +3,29 @@
    constant, motorPins control */
 
 const int motorPins[] = {5, 6, 9, 10}; //Declare constants for motorPins pins
+const int motorR1 = 5;
+const int motorR2 = 6;
+const int motorL1 = 9;
+const int motorL2 = 10;
 
 void setup()
 {
-    for (int i = 0; i < 4; i++)
-    {
-        pinMode(motorPins[i], OUTPUT); //Sets all the motor pins to output
-    }
+    pinMode(motorR1, OUTPUT);
+    pinMode(motorR2, OUTPUT);
+    pinMode(motorL1, OUTPUT);
+    pinMode(motorL2, OUTPUT);
 }
 
 void loop()
 {
-    forward(255, 3000);
-    reverse(150, 2000);
-    stop(1000);
-    reverse(75, 3500);
-    stop(2000);
-    forward(100, 2500);
+    motorMove(255, 0, 255, 0, 2000);
 }
 
-void forward(int speed, int time) //Spins the motors forward, at a controllable speed
+void motorMove(int rVal1, int rVal2, int lVal1, int lVal2, int time)
 {
-    analogWrite(motorPins[0], speed);
-    digitalWrite(motorPins[1], LOW);
-    analogWrite(motorPins[2], speed);
-    digitalWrite(motorPins[3], LOW);
-    delay(time);
-}
-
-void reverse(int speed, int time) //Spins the motors in reverse, at a controllable speed
-{
-    digitalWrite(motorPins[0], LOW);
-    analogWrite(motorPins[1], speed);
-    digitalWrite(motorPins[2], LOW);
-    analogWrite(motorPins[3], speed);
-    delay(time);
-}
-
-void stop(int time) // Stops the motors
-{
-    for (int i = 0; i < 4; i++)
-    {
-        digitalWrite(motorPins[i], LOW);
-    }
+    analogWrite(motorR1, rVal1);
+    analogWrite(motorR2, rVal2);
+    analogWrite(motorL1, lVal1);
+    analogWrite(motorL2, lVal2);
     delay(time);
 }
