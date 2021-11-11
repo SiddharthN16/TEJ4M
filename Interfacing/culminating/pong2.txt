@@ -1,8 +1,8 @@
 #include <LedControl.h>
 
-int DIN = 12;
-int CS = 11;
-int CLK = 10;
+int DIN = 7;
+int CS = 8;
+int CLK = 9;
 
 byte displayImage[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 // considering a 2d co-ordinate system with origin (0,0) at bottom left corner
@@ -19,9 +19,9 @@ void setup()
 {
     pinMode(2, INPUT);
     pinMode(3, INPUT);
-    lc.shutdown(0, false);  // Keep MAX72XX awake
-    lc.setIntensity(0, 15); // Set the brightness to maximum value
-    lc.clearDisplay(0);     // and clear the display
+    lc.shutdown(0, false); // Keep MAX72XX awake
+    lc.setIntensity(0, 8); // Set the brightness to maximum value
+    lc.clearDisplay(0);    // and clear the display
 }
 
 void loop()
