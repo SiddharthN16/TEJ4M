@@ -1,3 +1,5 @@
+#include <LedControl.h>
+
 const int joy1x = 0;
 const int joy1y = 1;
 const int joy2x = 2;
