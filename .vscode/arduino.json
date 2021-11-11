@@ -1,7 +1,0 @@
-{
-    "board": "arduino:avr:uno",
-    "programmer": "arduino:avrispmkii",
-    "port": "COM12",
-    "sketch": "Interfacing\\lab-01-leds\\lab-01-leds.ino",
-    "output": "Interfacing/build"
-}
