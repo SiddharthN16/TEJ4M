@@ -112,13 +112,9 @@ void loop()
             speedY *= -1;
         }
 
-        Serial.println(ballX);
-        Serial.println(disp);
-        // Serial.println(disp);
         lc.setLed(disp, ballX, ballY, true);
         delay(random(40, 65));
         lc.setLed(disp, ballX, ballY, false);
-        // onState = collision(ballX, ballY, y1Val, y2Val);
 
         paddleRight(y1Val);
         paddleLeft(y2Val);
@@ -141,7 +137,7 @@ void paddleRight(int y)
 
 void paddleLeft(int y)
 {
-    int yPos = map(y, 0, 1023, 0, 7);
+    int yPos = map(y, 0, 1023, 6, -1);
     lc.setRow(0, 0, paddles[yPos]);
     // delay(55);
 }
