@@ -1,6 +1,16 @@
 #include <LedControl.h>
 
-LedControl lc = LedControl(12, 11, 10, 1);
+LedControl lc = LedControl(12, 11, 10, 2);
+
+byte paddles[] =
+    {
+        B11000000,
+        B01100000,
+        B00110000,
+        B00011000,
+        B00001100,
+        B00000110,
+        B00000011};
 
 const int joy1x = A0;
 const int joy1y = A1;
@@ -20,10 +30,12 @@ bool onState;
 
 int spawnX = random(3, 4);
 int spawnY = random(0, 7);
-float ballX = 2, ballY = 4;
-int speedX = 1, speedY;
+float ballX = random(1, 6), ballY = 4;
+int speedX = 1, speedY = random(-1, 1);
 
 bool spawn = true;
+
+int disp = random(0, 1);
 
 void setup()
 {
@@ -36,6 +48,10 @@ void setup()
     lc.shutdown(0, false);
     lc.setIntensity(0, 12);
     lc.clearDisplay(0);
+
+    lc.shutdown(1, false);
+    lc.setIntensity(1, 12);
+    lc.clearDisplay(1);
 }
 
 void loop()
@@ -64,20 +80,49 @@ void loop()
         digitalWrite(ON_LED, (onState) ? HIGH : LOW);
     }
 
+    // x1Val = analogRead(joy1x);
+    y1Val = analogRead(joy1y);
+    // x2Val = analogRead(joy2x);
+    y2Val = analogRead(joy2y);
+
     if (onState)
     {
-        // x1Val = analogRead(joy1x);
-        y1Val = analogRead(joy1y);
-        // x2Val = analogRead(joy2x);
-        y2Val = analogRead(joy2y);
 
-        ballMovement(ballX, ballY, speedX, speedY);
+        ballX += speedX;
+        ballY += speedY;
 
+        if (ballX < 0 && disp == 0)
+        {
+            speedX *= -1;
+        }
+
+        if ((ballX >= 7 && disp == 0) || (ballX <= 0 && disp == 1))
+        {
+            disp = (disp == 0) ? 1 : 0;
+            ballX = (disp == 1) ? 0 : 7;
+        }
+
+        if (ballX > 7 && disp == 1)
+        {
+            speedX *= -1;
+        }
+
+        if (ballY <= 0 || ballY >= 7)
+        {
+            speedY *= -1;
+        }
+
+        Serial.println(ballX);
+        Serial.println(disp);
+        // Serial.println(disp);
+        lc.setLed(disp, ballX, ballY, true);
+        delay(55);
+        lc.setLed(disp, ballX, ballY, false);
         // onState = collision(ballX, ballY, y1Val, y2Val);
 
         paddleRight(y1Val);
         paddleLeft(y2Val);
-        lc.clearDisplay(0);
+        // delay(55);
     }
     else
     {
@@ -87,17 +132,16 @@ void loop()
 
 void paddleRight(int y)
 {
-    int yPos = map(y, 0, 1023, 6, -1);
-    lc.setLed(0, 7, yPos, true);
-    lc.setLed(0, 7, yPos + 1, true);
+    int yPos = map(y, 0, 1023, 0, 7);
+    lc.setRow(1, 7, paddles[yPos]);
+    // delay(55);
 }
 
 void paddleLeft(int y)
 {
-    int yPos = map(y, 0, 1023, 6, -1);
-    lc.setLed(0, 0, yPos, true);
-    lc.setLed(0, 0, yPos + 1, true);
-    delay(55);
+    int yPos = map(y, 0, 1023, 0, 7);
+    lc.setRow(0, 0, paddles[yPos]);
+    // delay(55);
 }
 
 bool collision(int ballX, int ballY, int paddle1Y, int paddle2Y)
@@ -118,8 +162,4 @@ bool collision(int ballX, int ballY, int paddle1Y, int paddle2Y)
 
 void ballMovement(int ballX, int ballY, int speedX, int speedY)
 {
-    lc.setLed(0, ballX += 1, ballY, true);
-    ballX += 0.000001;
-    delay(100);
-    Serial.println(ballX);
 }
