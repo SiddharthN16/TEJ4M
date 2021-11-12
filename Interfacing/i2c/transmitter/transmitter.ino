@@ -1,6 +1,6 @@
 #include <LedControl.h>
 
-LedControl lc = LedControl(12, 11, 10, 2);
+LedControl lc = LedControl(12, 11, 10, 1);
 
 const int joy1x = A0;
 const int joy1y = A1;
@@ -36,10 +36,6 @@ void setup()
     lc.shutdown(0, false);
     lc.setIntensity(0, 12);
     lc.clearDisplay(0);
-
-    lc.shutdown(1, false);
-    lc.setIntensity(1, 12);
-    lc.clearDisplay(1);
 }
 
 void loop()
@@ -81,9 +77,7 @@ void loop()
 
         paddleRight(y1Val);
         paddleLeft(y2Val);
-
-        lc.setRow(1, 0, B11111111);
-        // delay(55);
+        lc.clearDisplay(0);
     }
     else
     {
@@ -93,11 +87,9 @@ void loop()
 
 void paddleRight(int y)
 {
-    int yPos = map(y, 0, 1023, 0, 7);
-    lc.setLed(1, 7, yPos, true);
-    lc.setLed(1, 7, yPos + 1, true);
-    // delay(55);
-    lc.setRow(1, 7, B00000000);
+    int yPos = map(y, 0, 1023, 6, -1);
+    lc.setLed(0, 7, yPos, true);
+    lc.setLed(0, 7, yPos + 1, true);
 }
 
 void paddleLeft(int y)
@@ -105,8 +97,7 @@ void paddleLeft(int y)
     int yPos = map(y, 0, 1023, 6, -1);
     lc.setLed(0, 0, yPos, true);
     lc.setLed(0, 0, yPos + 1, true);
-    // delay(55);
-    lc.setRow(0, 0, B00000000);
+    delay(55);
 }
 
 bool collision(int ballX, int ballY, int paddle1Y, int paddle2Y)
@@ -127,6 +118,8 @@ bool collision(int ballX, int ballY, int paddle1Y, int paddle2Y)
 
 void ballMovement(int ballX, int ballY, int speedX, int speedY)
 {
-    lc.setLed(0, ballX, ballY, true);
-    ballX += 1;
+    lc.setLed(0, ballX += 1, ballY, true);
+    ballX += 0.000001;
+    delay(100);
+    Serial.println(ballX);
 }

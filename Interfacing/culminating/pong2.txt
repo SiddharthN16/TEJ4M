@@ -37,7 +37,7 @@ void loop()
     }
 
     // bouncing off ceiling
-    if (ballY == 7)
+    if (ballY == 7 || ballY == 0)
     {
         speedY = speedY * -1; // bouncing off the ceiling
     }
