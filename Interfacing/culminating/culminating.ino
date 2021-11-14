@@ -1,6 +1,8 @@
 #include <LedControl.h>
+#include <LiquidCrystal_I2C.h>
 
-LedControl lc = LedControl(12, 11, 10, 2);
+LedControl matrix = LedControl(12, 11, 10, 2);
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 byte paddles[] =
     {
@@ -47,13 +49,18 @@ void setup()
     pinMode(ECHO_PIN, INPUT);
     pinMode(TRIGGER_PIN, OUTPUT);
 
-    lc.shutdown(0, false);
-    lc.setIntensity(0, 12);
-    lc.clearDisplay(0);
+    matrix.shutdown(0, false);
+    matrix.setIntensity(0, 12);
+    matrix.clearDisplay(0);
 
-    lc.shutdown(1, false);
-    lc.setIntensity(1, 12);
-    lc.clearDisplay(1);
+    matrix.shutdown(1, false);
+    matrix.setIntensity(1, 12);
+    matrix.clearDisplay(1);
+
+    lcd.init();
+    lcd.backlight();
+    lcd.setCursor(0, 0);
+    lcd.print("Hello World!");
 }
 
 void loop()
@@ -77,6 +84,11 @@ void loop()
 
         ballX += speedX;
         ballY += speedY;
+
+        Serial.print("SpeedX: ");
+        Serial.print(speedX);
+        Serial.print("    \t SpeedY: ");
+        Serial.println(speedY);
 
         //Bounces of Bottom or Top of Screen
         if (ballY <= 0 || ballY >= 7)
@@ -120,12 +132,12 @@ void loop()
                 //Closest paddle point
                 if (ballY == pad2Pos + 1)
                 {
-                    speedY *= -1;
+                    speedY *= random(-125, -95) / 95;
                 }
                 //Farthest paddle point
                 else if (ballY == pad2Pos - 1)
                 {
-                    speedY *= 2;
+                    speedY *= random(175, 215) / 95;
                 }
             }
             //When ball was below paddle
@@ -134,15 +146,15 @@ void loop()
                 //Closest paddle point
                 if (ballY == pad2Pos - 1)
                 {
-                    speedY *= -1;
+                    speedY *= random(-125, -95) / 95;
                 }
                 //Farthest paddle point
                 else if (ballY == pad2Pos + 1)
                 {
-                    speedY *= 2;
+                    speedY *= random(175, 215) / 95;
                 }
             }
-            speedX *= -1;
+            speedX *= random(-125, -95) / 95;
         }
 
         //Bouncing of Right Paddle
@@ -186,9 +198,9 @@ void loop()
             ballX = (disp == 1) ? 0 : 7;
         }
 
-        lc.setLed(disp, ballX, ballY, true);
+        matrix.setLed(disp, ballX, ballY, true);
         delay(random(40, 65));
-        lc.setLed(disp, ballX, ballY, false);
+        matrix.setLed(disp, ballX, ballY, false);
 
         pad1Pos = paddleRight(y1Val) + 1;
         pad2Pos = paddleLeft(y2Val) + 1;
@@ -200,8 +212,10 @@ void loop()
             digitalWrite(ON_LED, LOW);
 
             noTone(BUZZER_PIN);
-            lc.clearDisplay(0);
-            lc.clearDisplay(1);
+            matrix.clearDisplay(0);
+            matrix.clearDisplay(1);
+
+            disp = 0;
             ballX = 4;
             ballY = 4;
             speedX = 1;
@@ -213,16 +227,16 @@ void loop()
 
 int paddleRight(int y)
 {
-    int yPos = map(y, 0, 1023, 0, 6);
-    lc.setRow(1, 7, paddles[yPos]);
+    int yPos = map(y, 0, 1000, 5, 0);
+    matrix.setRow(1, 7, paddles[yPos]);
     // delay(55);
     return yPos;
 }
 
 int paddleLeft(int y)
 {
-    int yPos = map(y, 0, 1023, 0, 6);
-    lc.setRow(0, 0, paddles[yPos]);
+    int yPos = map(y, 0, 1000, 5, 0);
+    matrix.setRow(0, 0, paddles[yPos]);
     // delay(55);
     return yPos;
 }
