@@ -1,7 +1,8 @@
 {
-    "board": "arduino:avr:uno",
+    "board": "arduino:avr:nano",
     "output": "./build",
     "programmer": "arduino:avrispmkii",
     "sketch": "receiver.ino",
-    "port": "COM11"
+    "port": "COM12",
+    "configuration": "cpu=atmega328"
 }
