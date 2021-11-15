@@ -100,10 +100,18 @@ void loop()
         if ((ballX < 0 && disp == 0) || (ballX > 7 && disp == 1))
         {
             disp = 0;
-            ballX = 4;
+            ballX = 7;
             ballY = 4;
             speedX = 1;
             speedY = 1;
+
+            for (int i = 0; i < 4; i++)
+            {
+                matrix.setLed(disp, ballX, ballY, true);
+                delay(100);
+                matrix.setLed(disp, ballX, ballY, false);
+                delay(100);
+            }
         }
 
         //Determine if ball is above or below the paddle on Display 0
