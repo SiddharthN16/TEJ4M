@@ -21,6 +21,7 @@
                 "C:\\Users\\sidne\\Documents\\Arduino\\libraries\\LedControl\\src",
                 "C:\\Users\\sidne\\Documents\\Arduino\\libraries\\LiquidCrystal_I2C",
                 "S:\\Arduino\\hardware\\arduino\\avr\\libraries\\Wire\\src",
+                "S:\\Arduino\\libraries\\LiquidCrystal\\src",
                 "s:\\arduino\\hardware\\tools\\avr\\lib\\gcc\\avr\\7.3.0\\include",
                 "s:\\arduino\\hardware\\tools\\avr\\lib\\gcc\\avr\\7.3.0\\include-fixed",
                 "s:\\arduino\\hardware\\tools\\avr\\avr\\include"
