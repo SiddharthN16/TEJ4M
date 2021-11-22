@@ -1,3 +1,15 @@
+/*
+-----------------------------------------------------------------------------
+Name:        Arduio Culminating - PONG
+Purpose:     Custom Arduino Project
+
+Author:      Siddharth Nema
+Created:     8-Nov-2021
+Updated:     22-Nov-2021
+-----------------------------------------------------------------------------
+*/
+
+// libarries required
 #include <LedControl.h>
 #include <LiquidCrystal_I2C.h>
 
