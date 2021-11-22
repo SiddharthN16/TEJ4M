@@ -1,9 +1,11 @@
 #include <LedControl.h>
 #include <LiquidCrystal_I2C.h>
 
+// initalizing matrix and lcd objects
 LedControl matrix = LedControl(12, 11, 10, 2);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
+// possible positions for the paddles
 byte paddlePositions[6] =
     {B11100000,
      B01110000,
@@ -11,37 +13,43 @@ byte paddlePositions[6] =
      B00011100,
      B00001110,
      B00000111};
+
+// holds the position of the paddles
 byte paddleVal[2] = {0x00, 0x00};
 
+// analog pins where the joysticks are connected
 const int joy1y = A0;
 const int joy2y = A1;
 
-int y1Val, y2Val;
-int pad1Pos, pad2Pos;
+int y1Val, y2Val;     // raw input values from the joysticks
+int pad1Pos, pad2Pos; // joystick positions mapped to matrix
 
-const int BUZZER_PIN = 5;
+const int BUZZER_PIN = 5; // pin where the buzzer is connected
 
-const int ON_LED = 2;
-int onBtn;
-bool onState;
+const int ON_LED = 2; // pin where the led is connected
+int onBtn;            // reading the value of the button
+bool onState;         // boolean to toggle the game
 
-bool canSpawn = true;
+bool canSpawn = true; // boolean to know if the ball should respawn
 
+// controlling the position & speed of the ball
 float ballX = 4, ballY = 4;
 float speedX = 1, speedY = -1;
 
-int prevPos;
+int prevPos; // to know the previous position of the ball
 
-int disp = 0;
+int disp = 0; //  specifies the matrix display
 
+// controlling the score
 int rightScore = 0;
 int leftScore = 0;
 int prevRight = rightScore;
 int prevLeft = leftScore;
 
+// indexing the beginning & end of lcd string
 int stringStart, stringStop = 0;
 int scrollCursor = 16;
-String message = "Push the Button to Begin!";
+String message = "Push the Button to Begin!"; // message to display on lcd
 
 void setup()
 {
@@ -65,43 +73,51 @@ void setup()
 
 void loop()
 {
-    onBtn = digitalRead(3);
+    onBtn = digitalRead(3); // read the value of the button
 
+    // printing the top line of lcd screen
     lcd.setCursor(0, 0);
     lcd.print("Welcome to PONG!");
 
+    // printing the second scolling text line of lcd
     lcd.setCursor(scrollCursor, 1);
     lcd.print(message.substring(stringStart, stringStop));
 
     delay(200);
     lcd.clear();
 
+    // moves the cursor until its 0
     if (stringStart == 0 && scrollCursor > 0)
     {
         scrollCursor--;
         stringStop++;
     }
+    // resetting the variables to start scrolling again
     else if (stringStart == stringStop)
     {
-        stringStart = stringStop = 0;
+        stringStart = stringStop = 0; // change later
         scrollCursor = 16;
     }
+    // remove text when off screen
     else if (stringStop == message.length() && scrollCursor == 0)
     {
         stringStart++;
     }
+    // to scroll in the background back to beginning
     else
     {
         stringStart++;
         stringStop++;
     }
-
+    // when button is pressed
     if (onBtn == LOW)
     {
         delay(200);
         onState = (onState) ? false : true;           //ternary statement to which sets toggles onState between true & false
         digitalWrite(ON_LED, (onState) ? HIGH : LOW); // ternary statement which sets the led to high or low depending on onState being true
     }
+
+    // playing the game when the button is first pressed
     while (onState)
     {
         // reading inputs
@@ -115,30 +131,30 @@ void loop()
         pad2Pos = createPaddle(y2Val, 0);
         drawPaddles(paddleVal);
 
+        // displaying the scores for each player
         lcd.setCursor(5, 0);
         lcd.print("SCORES");
+
+        // only displaying scores when they are updated to save memory
         if (rightScore != prevRight)
         {
             lcd.setCursor(14, 1);
             lcd.print(rightScore);
-
             prevRight = rightScore;
         }
-
+        // only displaying scores when they are updated to save memory
         if (leftScore != prevLeft)
         {
             lcd.setCursor(0, 1);
             lcd.print(leftScore);
-
             prevLeft = leftScore;
         }
-
+        // when the game first startts spawn the ball
         if (canSpawn)
         {
             spawn(disp, ballX, ballY, speedX, speedY);
             canSpawn = false;
         }
-
         // moving ball depending on the speed
         ballX += speedX;
         ballY += speedY;
@@ -148,18 +164,20 @@ void loop()
         {
             speedY *= -1;
         }
-
         // when ball bounces of Left & Right [TEMP]
         if ((ballX < 0 && disp == 0) || (ballX > 7 && disp == 1))
         {
+            // if ball goes out on left side, add score to right player
             if (ballX < 0 && disp == 0)
             {
                 rightScore++;
             }
+            // if ball goes out on right side, add score to left player
             else if (ballX > 7 && disp == 1)
             {
                 leftScore++;
             }
+
             // resetting ball data to respawn the ball
             disp = 0;
             ballX = 7;
@@ -168,7 +186,6 @@ void loop()
             speedY = 1;
             spawn(disp, ballX, ballY, speedX, speedY);
         }
-
         // determine if ball is above or below the paddle on Display 0
         if (disp == 0)
         {
@@ -253,14 +270,12 @@ void loop()
             }
             speedX *= -1;
         }
-
         //Switching between 2 Matrixes
         if ((ballX > 7 && disp == 0) || (ballX < 0 && disp == 1))
         {
             disp = (disp == 0) ? 1 : 0;
             ballX = (disp == 1) ? 0 : 7;
         }
-
         // reseting all variables to turn off the game
         if (onBtn == LOW)
         {
@@ -313,7 +328,6 @@ void drawBall(int disp, int ballX, int ballY)
 
 void spawn(int disp, int ballX, int ballY, int speedX, int speedY)
 {
-
     // blink the ball when respawning the ball
     for (int i = 0; i < 8; i++)
     {
