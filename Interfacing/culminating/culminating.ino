@@ -4,117 +4,172 @@
 LedControl matrix = LedControl(12, 11, 10, 2);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-byte paddles[] =
-    {
-        B11100000,
-        B01110000,
-        B00111000,
-        B00011100,
-        B00001110,
-        B00000111};
+byte paddlePositions[6] =
+    {B11100000,
+     B01110000,
+     B00111000,
+     B00011100,
+     B00001110,
+     B00000111};
+byte paddleVal[2] = {0x00, 0x00};
 
-const int joy1x = A0;
-const int joy1y = A1;
-const int joy2x = A2;
-const int joy2y = A3;
+const int joy1y = A0;
+const int joy2y = A1;
 
-int x1Val, y1Val, x2Val, y2Val;
+int y1Val, y2Val;
 int pad1Pos, pad2Pos;
 
-const int BUZZER_PIN = 4;
-const int ECHO_PIN = 5;
-const int TRIGGER_PIN = 6;
-float duration, distance;
+const int BUZZER_PIN = 5;
 
 const int ON_LED = 2;
 int onBtn;
 bool onState;
 
+bool canSpawn = true;
+
 float ballX = 4, ballY = 4;
-int spawnX = random(3, 4);
-int spawnY = random(0, 7);
 float speedX = 1, speedY = -1;
 
 int prevPos;
 
-bool spawn = true;
-
 int disp = 0;
+
+int rightScore = 0;
+int leftScore = 0;
+int prevRight = rightScore;
+int prevLeft = leftScore;
+
+int stringStart, stringStop = 0;
+int scrollCursor = 16;
+String message = "Push the Button to Begin!";
 
 void setup()
 {
     Serial.begin(9600);
+
     pinMode(ON_LED, OUTPUT);
-    pinMode(BUZZER_PIN, OUTPUT);
-    pinMode(ECHO_PIN, INPUT);
-    pinMode(TRIGGER_PIN, OUTPUT);
 
-    matrix.shutdown(0, false);
-    matrix.setIntensity(0, 12);
-    matrix.clearDisplay(0);
+    //waking up, setting brightness and clearing both matrixes
+    for (int i = 0; i < 2; i++)
+    {
+        matrix.shutdown(i, false);
+        matrix.setIntensity(i, 12);
+        matrix.clearDisplay(i);
+    }
 
-    matrix.shutdown(1, false);
-    matrix.setIntensity(1, 12);
-    matrix.clearDisplay(1);
-
+    //initalizing the lcd display
     lcd.init();
     lcd.backlight();
-    lcd.setCursor(0, 0);
-    lcd.print("Hello World!");
+    lcd.clear();
 }
 
 void loop()
 {
-
     onBtn = digitalRead(3);
+
+    lcd.setCursor(0, 0);
+    lcd.print("Welcome to PONG!");
+
+    lcd.setCursor(scrollCursor, 1);
+    lcd.print(message.substring(stringStart, stringStop));
+
+    delay(200);
+    lcd.clear();
+
+    if (stringStart == 0 && scrollCursor > 0)
+    {
+        scrollCursor--;
+        stringStop++;
+    }
+    else if (stringStart == stringStop)
+    {
+        stringStart = stringStop = 0;
+        scrollCursor = 16;
+    }
+    else if (stringStop == message.length() && scrollCursor == 0)
+    {
+        stringStart++;
+    }
+    else
+    {
+        stringStart++;
+        stringStop++;
+    }
 
     if (onBtn == LOW)
     {
         delay(200);
-        onState = (onState) ? false : true;
-        digitalWrite(ON_LED, (onState) ? HIGH : LOW);
+        onState = (onState) ? false : true;           //ternary statement to which sets toggles onState between true & false
+        digitalWrite(ON_LED, (onState) ? HIGH : LOW); // ternary statement which sets the led to high or low depending on onState being true
     }
     while (onState)
     {
+        // reading inputs
         onBtn = digitalRead(3);
-        x1Val = analogRead(joy1x);
         y1Val = analogRead(joy1y);
-        x2Val = analogRead(joy2x);
         y2Val = analogRead(joy2y);
 
+        // drawing the ball & paddles
+        drawBall(disp, ballX, ballY);
+        pad1Pos = createPaddle(y1Val, 1);
+        pad2Pos = createPaddle(y2Val, 0);
+        drawPaddles(paddleVal);
+
+        lcd.setCursor(5, 0);
+        lcd.print("SCORES");
+        if (rightScore != prevRight)
+        {
+            lcd.setCursor(14, 1);
+            lcd.print(rightScore);
+
+            prevRight = rightScore;
+        }
+
+        if (leftScore != prevLeft)
+        {
+            lcd.setCursor(0, 1);
+            lcd.print(leftScore);
+
+            prevLeft = leftScore;
+        }
+
+        if (canSpawn)
+        {
+            spawn(disp, ballX, ballY, speedX, speedY);
+            canSpawn = false;
+        }
+
+        // moving ball depending on the speed
         ballX += speedX;
         ballY += speedY;
 
-        Serial.print("SpeedX: ");
-        Serial.print(speedX);
-        Serial.print("    \t SpeedY: ");
-        Serial.println(speedY);
-
-        //Bounces of Bottom or Top of Screen
+        //when ball bounces of Bottom or Top of Screen
         if (ballY <= 0 || ballY >= 7)
         {
             speedY *= -1;
         }
 
-        //Bounces of Left & Right [TEMP]
+        // when ball bounces of Left & Right [TEMP]
         if ((ballX < 0 && disp == 0) || (ballX > 7 && disp == 1))
         {
+            if (ballX < 0 && disp == 0)
+            {
+                rightScore++;
+            }
+            else if (ballX > 7 && disp == 1)
+            {
+                leftScore++;
+            }
+            // resetting ball data to respawn the ball
             disp = 0;
             ballX = 7;
             ballY = 4;
             speedX = 1;
             speedY = 1;
-
-            for (int i = 0; i < 4; i++)
-            {
-                matrix.setLed(disp, ballX, ballY, true);
-                delay(100);
-                matrix.setLed(disp, ballX, ballY, false);
-                delay(100);
-            }
+            spawn(disp, ballX, ballY, speedX, speedY);
         }
 
-        //Determine if ball is above or below the paddle on Display 0
+        // determine if ball is above or below the paddle on Display 0
         if (disp == 0)
         {
             if (ballX == 1)
@@ -122,7 +177,7 @@ void loop()
                 prevPos = ballY;
             }
         }
-        //Determine if ball is above or below the paddle on Display 1
+        // Determine if ball is above or below the paddle on Display 1
         else if (disp == 1)
         {
             if (ballX == 6)
@@ -131,7 +186,7 @@ void loop()
             }
         }
 
-        //Bouncing of Left Paddle
+        //ball bouncing off Left Paddle
         if ((ballX == 0 && (ballY == pad2Pos - 1 || ballY == pad2Pos || ballY == pad2Pos + 1)) && disp == 0)
         {
             // When ball was above paddle
@@ -165,7 +220,7 @@ void loop()
             speedX *= random(-125, -95) / 95;
         }
 
-        //Bouncing of Right Paddle
+        // ball bouncing of Right Paddle
         else if ((ballX == 7 && (ballY == pad1Pos - 1 || ballY == pad1Pos || ballY == pad1Pos + 1)) && disp == 1)
         {
             // When ball was above paddle
@@ -206,16 +261,10 @@ void loop()
             ballX = (disp == 1) ? 0 : 7;
         }
 
-        matrix.setLed(disp, ballX, ballY, true);
-        delay(random(40, 65));
-        matrix.setLed(disp, ballX, ballY, false);
-
-        pad1Pos = paddleRight(y1Val) + 1;
-        pad2Pos = paddleLeft(y2Val) + 1;
-
+        // reseting all variables to turn off the game
         if (onBtn == LOW)
         {
-            delay(200);
+            delay(250);
             onState = false;
             digitalWrite(ON_LED, LOW);
 
@@ -228,23 +277,49 @@ void loop()
             ballY = 4;
             speedX = 1;
             speedY = -1;
+            canSpawn = true;
+            leftScore = 0;
+            rightScore = 0;
             break;
         }
     }
 }
 
-int paddleRight(int y)
+// function to create the paddle positions
+int createPaddle(int y, int paddle)
 {
     int yPos = map(y, 0, 1000, 5, 0);
-    matrix.setRow(1, 7, paddles[yPos]);
-    // delay(55);
+    paddleVal[paddle] = paddlePositions[yPos];
+
     return yPos;
 }
 
-int paddleLeft(int y)
+// functions to draw both paddles
+void drawPaddles(byte paddleVal[2])
 {
-    int yPos = map(y, 0, 1000, 5, 0);
-    matrix.setRow(0, 0, paddles[yPos]);
-    // delay(55);
-    return yPos;
+    for (int i = 0; i < 2; i++)
+    {
+        matrix.setRow(i, i * 7, paddleVal[i]);
+    }
+}
+
+// function to draw the ball
+void drawBall(int disp, int ballX, int ballY)
+{
+    matrix.setLed(disp, ballX, ballY, true);
+    delay(40);
+    matrix.setLed(disp, ballX, ballY, false);
+}
+
+void spawn(int disp, int ballX, int ballY, int speedX, int speedY)
+{
+
+    // blink the ball when respawning the ball
+    for (int i = 0; i < 8; i++)
+    {
+        matrix.setLed(disp, ballX, ballY, true);
+        delay(100);
+        matrix.setLed(disp, ballX, ballY, false);
+        delay(100);
+    }
 }
