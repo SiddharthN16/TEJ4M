@@ -326,6 +326,7 @@ void drawBall(int disp, int ballX, int ballY)
     matrix.setLed(disp, ballX, ballY, false);
 }
 
+// function to respawn the ball
 void spawn(int disp, int ballX, int ballY, int speedX, int speedY)
 {
     // blink the ball when respawning the ball
