@@ -1,19 +1,19 @@
 /*
 -----------------------------------------------------------------------------
-Name:        Arduio Culminating - PONG
+Name:        Arduino Culminating - PONG
 Purpose:     Custom Arduino Project
 
 Author:      Siddharth Nema
-Created:     8-Nov-2021
+Created:     11-Nov-2021
 Updated:     22-Nov-2021
 -----------------------------------------------------------------------------
 */
 
-// libarries required
+// libraries required
 #include <LedControl.h>
 #include <LiquidCrystal_I2C.h>
 
-// initalizing matrix and lcd objects
+// initializing matrix and lcd objects
 LedControl matrix = LedControl(12, 11, 10, 2);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
@@ -58,7 +58,7 @@ int leftScore = 0;
 int prevRight = rightScore;
 int prevLeft = leftScore;
 
-// indexing the beginning & end of lcd string
+// indexing the beginning & end of l`cd string
 int stringStart, stringStop = 0;
 int scrollCursor = 16;
 String message = "Push the Button to Begin!"; // message to display on lcd
@@ -67,7 +67,9 @@ void setup()
 {
     Serial.begin(9600);
 
+    // setting pinmodes for led and buzzer
     pinMode(ON_LED, OUTPUT);
+    pinMode(BUZZER_PIN, OUTPUT);
 
     //waking up, setting brightness and clearing both matrixes
     for (int i = 0; i < 2; i++)
@@ -77,7 +79,7 @@ void setup()
         matrix.clearDisplay(i);
     }
 
-    //initalizing the lcd display
+    //initializing the lcd display
     lcd.init();
     lcd.backlight();
     lcd.clear();
@@ -91,12 +93,12 @@ void loop()
     lcd.setCursor(0, 0);
     lcd.print("Welcome to PONG!");
 
-    // printing the second scolling text line of lcd
+    // printing the second scrolling text line of lcd
     lcd.setCursor(scrollCursor, 1);
     lcd.print(message.substring(stringStart, stringStop));
 
     delay(200);
-    lcd.clear();
+    lcd.clear(); // clearing the display
 
     // moves the cursor until its 0
     if (stringStart == 0 && scrollCursor > 0)
@@ -176,7 +178,7 @@ void loop()
         {
             speedY *= -1;
         }
-        // when ball bounces of Left & Right [TEMP]
+        // when ball bounces of Left & Right
         if ((ballX < 0 && disp == 0) || (ballX > 7 && disp == 1))
         {
             // if ball goes out on left side, add score to right player
@@ -196,6 +198,8 @@ void loop()
             ballY = 4;
             speedX = 1;
             speedY = 1;
+
+            playTone(BUZZER_PIN, 200, 500);
             spawn(disp, ballX, ballY, speedX, speedY);
         }
         // determine if ball is above or below the paddle on Display 0
@@ -221,32 +225,34 @@ void loop()
             // When ball was above paddle
             if (prevPos > pad2Pos)
             {
-                //Closest paddle point
+                // bouncing off closest paddle point
                 if (ballY == pad2Pos + 1)
                 {
                     speedY *= random(-125, -95) / 95;
                 }
-                //Farthest paddle point
+                // bouncing off farthest paddle point
                 else if (ballY == pad2Pos - 1)
                 {
                     speedY *= random(175, 215) / 95;
                 }
             }
-            //When ball was below paddle
+            // when ball was below paddle
             else if (prevPos < pad2Pos)
             {
-                //Closest paddle point
+                //bouncing off closest paddle point
                 if (ballY == pad2Pos - 1)
                 {
                     speedY *= random(-125, -95) / 95;
                 }
-                //Farthest paddle point
+                //bouncing farthest paddle point
                 else if (ballY == pad2Pos + 1)
                 {
                     speedY *= random(175, 215) / 95;
                 }
             }
-            speedX *= random(-125, -95) / 95;
+
+            playTone(BUZZER_PIN, 750, 100);   // playing the tone when ball hits paddle
+            speedX *= random(-125, -95) / 95; // reversing the x direction
         }
 
         // ball bouncing of Right Paddle
@@ -255,12 +261,12 @@ void loop()
             // When ball was above paddle
             if (prevPos > pad1Pos)
             {
-                //Closest paddle point
+                //bouncing off closest paddle point
                 if (ballY == pad1Pos + 1)
                 {
                     speedY *= -1;
                 }
-                //Farthest paddle point
+                //bouncing off farthest paddle point
                 else if (ballY == pad1Pos - 1)
                 {
                     speedY *= 2;
@@ -269,18 +275,19 @@ void loop()
             //When ball was below paddle
             else if (prevPos < pad1Pos)
             {
-                //Closest paddle point
+                //bouncing off closest paddle point
                 if (ballY == pad1Pos - 1)
                 {
                     speedY *= -1;
                 }
-                //Farthest paddle point
+                //bouncing off farthest paddle point
                 else if (ballY == pad1Pos + 1)
                 {
                     speedY *= 2;
                 }
             }
-            speedX *= -1;
+            playTone(BUZZER_PIN, 750, 100);   // playing the tone when ball hits paddle
+            speedX *= random(-125, -95) / 95; // reversing the x direction
         }
         //Switching between 2 Matrixes
         if ((ballX > 7 && disp == 0) || (ballX < 0 && disp == 1))
@@ -288,17 +295,20 @@ void loop()
             disp = (disp == 0) ? 1 : 0;
             ballX = (disp == 1) ? 0 : 7;
         }
-        // reseting all variables to turn off the game
+        // resetting all variables to turn off the game
         if (onBtn == LOW)
         {
             delay(250);
             onState = false;
-            digitalWrite(ON_LED, LOW);
+            digitalWrite(ON_LED, LOW); // turn off led
 
-            noTone(BUZZER_PIN);
+            noTone(BUZZER_PIN); // stop buzzer
+
+            //clear matrices
             matrix.clearDisplay(0);
             matrix.clearDisplay(1);
 
+            // resetting all variables
             disp = 0;
             ballX = 4;
             ballY = 4;
@@ -324,6 +334,7 @@ int createPaddle(int y, int paddle)
 // functions to draw both paddles
 void drawPaddles(byte paddleVal[2])
 {
+    // draw
     for (int i = 0; i < 2; i++)
     {
         matrix.setRow(i, i * 7, paddleVal[i]);
@@ -333,6 +344,7 @@ void drawPaddles(byte paddleVal[2])
 // function to draw the ball
 void drawBall(int disp, int ballX, int ballY)
 {
+    // draw ball at specified position
     matrix.setLed(disp, ballX, ballY, true);
     delay(40);
     matrix.setLed(disp, ballX, ballY, false);
@@ -349,4 +361,12 @@ void spawn(int disp, int ballX, int ballY, int speedX, int speedY)
         matrix.setLed(disp, ballX, ballY, false);
         delay(100);
     }
+}
+
+// function to play a tone of any frequency for set amount of time
+void playTone(int pin, int frequency, int time)
+{
+    tone(pin, frequency);
+    delay(time);
+    noTone(pin);
 }

@@ -4,5 +4,5 @@
     "sketch": "culminating.ino",
     "output": "./build",
     "configuration": "cpu=atmega328",
-    "port": "COM12"
+    "port": "COM16"
 }
