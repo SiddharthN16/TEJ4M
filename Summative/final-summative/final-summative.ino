@@ -1,5 +1,15 @@
+/*
+-----------------------------------------------------------------------------
+Name:        Final Summative
+Purpose:     Optional Final Summative for the TEJ4M0 Course
+ 
+Author:      Siddharth Nema
+Created:     19-Jan-2022
+Updated:     19-Jan-2022
+-----------------------------------------------------------------------------
+*/
 
-// libarries required
+// libraries required
 #include <LiquidCrystal.h>
 #include <Servo.h>
 
@@ -26,8 +36,7 @@ const int TRIGGER_PIN = 11;
 
 int mode = 1; // the current mode the case structure is in
 
-int currFloor = 1; // the elevator floor
-
+int currFloor = 1;      // the elevator floor
 int travelDelay = 5000; // time to travel through floors
 
 // variables for US sensor
@@ -42,12 +51,12 @@ void setup()
   lcd.begin(16, 2);
   lcd.clear();
 
-  // setup pushbuttons as inputs
+  // setup push buttons as inputs
   pinMode(firstfloorPB_PIN, INPUT);
   pinMode(secondfloorPB_PIN, INPUT);
   pinMode(thirdfloorPB_PIN, INPUT);
 
-  // attatch the servo to pin
+  // attach the servo to pin
   servo1.attach(servo_PIN);
 
   // set motor as outputs
@@ -249,7 +258,7 @@ void spinMotor(int direction, int travelDelay)
   // when the motor is spinning forwards
   if (direction == 1)
   {
-    // grdually increase motor speed when starting
+    // gradually increase motor speed when starting
     for (int i = 1500; i >= 0; i -= 100)
     {
       analogWrite(motorIn1_PIN, map(i, 1500, 0, 500, 0));
@@ -273,7 +282,7 @@ void spinMotor(int direction, int travelDelay)
   // when motor is spinning in reverse
   else if (direction == -1)
   {
-    // grdually increase motor speed when starting in opposite direction
+    // gradually increase motor speed when starting in opposite direction
     for (int i = 1500; i >= 0; i -= 100)
     {
       analogWrite(motorIn1_PIN, 500);
@@ -329,7 +338,7 @@ int moveServo(int degree, int mode)
       servo1.write(i);
       delay(100);
     }
-    // return value used to set the current floor the elveator is on
+    // return value used to set the current floor the elevator is on
     return mode - 1;
   }
 
